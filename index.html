@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Performance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+        }
+        
+        .vanta-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 1.5rem; /* Mais suave */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.15);
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(241, 241, 241, 0.5);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gradient-text {
+            background-image: linear-gradient(to right, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease-in-out;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 relative">
+    <div id="vanta-bg" class="vanta-bg"></div>
+    
+    <div class="min-h-screen">
+        <header class="bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-xl">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="flex items-center space-x-4">
+                        <div class="p-3 bg-white/30 rounded-full animate-bounce">
+                            <i data-feather="bar-chart-2" class="w-8 h-8"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold tracking-tight">Painel de Performance ✨</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <select id="month-selector" class="bg-blue-600/80 text-white px-4 py-2 rounded-lg appearance-none pr-8 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition">
+                                <option value="julho">Julho</option>
+                                <option value="agosto">Agosto</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                <i data-feather="chevron-down" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <select id="employee-selector" class="bg-blue-600/80 text-white px-4 py-2 rounded-lg appearance-none pr-8 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition">
+                                <option value="all">Todos</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                <i data-feather="chevron-down" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <button class="bg-white/90 text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-white transition flex items-center shadow hover:shadow-lg transform hover:-translate-y-1">
+                            <i data-feather="download" class="inline mr-2"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <div id="main-metrics-container" class="mb-8" data-aos="fade-up">
+                <h2 class="text-3xl font-bold gradient-text mb-6">Métricas Gerais 📈</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    </div>
+            </div>
+            
+            <div id="top-performers-container" class="mb-8" data-aos="fade-up">
+                <h2 class="text-3xl font-bold gradient-text mb-6">Destaques do Mês 🌟</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div id="top-performers-list" class="glass-card p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Melhores Performances 💪</h3>
+                        </div>
+                    <div id="bottom-performers-list" class="glass-card p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Oportunidades de Melhoria 🙏</h3>
+                        </div>
+                </div>
+            </div>
+
+            <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8" style="display: none;">
+                <div id="chart-productivity-card" class="glass-card p-6" data-aos="fade-right">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Evolução de Performance 🚀</h3>
+                    <div class="relative h-80">
+                        <canvas id="productivityChart"></canvas>
+                    </div>
+                </div>
+                <div id="chart-meal-card" class="glass-card p-6" data-aos="fade-left">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Métricas de Refeição ⏱️</h3>
+                    <div class="relative h-80">
+                        <canvas id="mealAccuracyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-xl shadow-md overflow-hidden" data-aos="fade-up">
+                <div class="px-6 py-4 border-b border-gray-200/50 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <h2 class="text-lg font-semibold text-gray-800">Detalhes por Colaborador 🧑‍💻</h2>
+                    <div class="relative w-full md:w-auto">
+                        <input type="text" placeholder="Buscar..." class="w-full pl-8 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <i data-feather="search" class="absolute left-3 top-3 text-gray-400 w-4 h-4"></i>
+                    </div>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="min-w-full divide-y divide-gray-200/50">
+                        <thead class="bg-gray-50/50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produtividade</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilização OUT</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ocorrências</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medidas Disc.</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atestados</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faltas Injust.</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fast Start</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Strong Finish</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meal Accuracy</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meal Accuracy Ult Bip</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meal Accuracy 1º Bip</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">HH Not Retun</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BH</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body" class="bg-white/50 divide-y divide-gray-200/50">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="px-6 py-3 border-t border-gray-200/50 flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">20</span> resultados
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            Anterior
+                        </button>
+                        <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            Próximo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="employee-modal" class="modal-overlay hidden">
+        <div class="modal-content w-full lg:w-3/5">
+            <div class="flex justify-between items-center border-b pb-4 mb-4">
+                <h2 id="modal-employee-name" class="text-2xl font-bold text-gray-800"></h2>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 transition">
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Métricas Detalhadas</h3>
+                    <div id="modal-metrics-list" class="space-y-3">
+                        </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Histórico de Performance</h3>
+                    <div class="relative h-80">
+                        <canvas id="modalChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializa as animações AOS e os ícones Feather
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        feather.replace();
+
+        // Fundo Vanta.js
+        VANTA.GLOBE({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: "#60a5fa", // Cor azul vibrante
+            backgroundColor: "#e0f2fe", // Cor de fundo suave
+            size: 0.8
+        });
+
+        // Dados consolidados
+        const allData = {
+            julho: [
+                { nome: 'GLEIDE CASSIA DOS SANTOS SILVA', ldap: 'gleidssilva', ocorrencias: 0, medidasDisciplinar: 1, atestado: 0, faltaInjustificada: 0, produtividade: 120.45, utilizacaoOut: 85.32, fastStart: '0:05:00', strongFinish: '0:02:00', mealAccuracy: '1:00:14', mealAccuracyUltBip: '0:03:00', mealAccuracy1Bip: '0:04:00', hhNotRetun: 2, bh: '-13:00:00', dashBonus: 125.00 },
+                { nome: 'LEONARDO BRITO CARDOSO', ldap: 'lbcardoso', ocorrencias: 0, medidasDisciplinar: 1, atestado: 2, faltaInjustificada: 2, produtividade: 143.11, utilizacaoOut: 80.30, fastStart: '0:00:00', strongFinish: '0:00:00', mealAccuracy: '0:59:46', mealAccuracyUltBip: '0:04:01', mealAccuracy1Bip: '0:04:18', hhNotRetun: 2, bh: '7:10:00', dashBonus: 125.00 },
+                { nome: 'LUCICLEUSA PIRES DOS SANTOS', ldap: 'lucicleuspsa', ocorrencias: 0, medidasDisciplinar: 1, atestado: 0, faltaInjustificada: 0, produtividade: 157.01, utilizacaoOut: 81.30, fastStart: '0:01:21', strongFinish: '0:00:00', mealAccuracy: '0:58:30', mealAccuracyUltBip: '0:03:00', mealAccuracy1Bip: '0:04:00', hhNotRetun: 0, bh: '-11:20:00', dashBonus: 150.00 },
+                { nome: 'MAIRLLAR DOS SANTOS BARCELOS', ldap: 'mbarcelos', ocorrencias: 0, medidasDisciplinar: 0, atestado: 2, faltaInjustificada: 0, produtividade: 151.89, utilizacaoOut: 82.81, fastStart: '0:01:32', strongFinish: '0:00:00', mealAccuracy: '0:57:22', mealAccuracyUltBip: '0:03:37', mealAccuracy1Bip: '0:04:27', hhNotRetun: 0, bh: '-11:20:00', dashBonus: 125.00 },
+                { nome: 'VILMA VENANCIO DOS SANTOS', ldap: 'vvdossantos', ocorrencias: 0, medidasDisciplinar: 1, atestado: 0, faltaInjustificada: 0, produtividade: 153.55, utilizacaoOut: 86.51, fastStart: '0:01:30', strongFinish: '0:00:00', mealAccuracy: '0:59:13', mealAccuracyUltBip: '0:07:53', mealAccuracy1Bip: '0:05:23', hhNotRetun: 0, bh: '-10:17:00', dashBonus: 125.00 },
+                { nome: 'MARIA APARECIDA SANTOS SOUZA', ldap: 'ext_aparemar', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 144.31, utilizacaoOut: 84.87, fastStart: '0:00:00', strongFinish: '0:00:00', mealAccuracy: '0:58:35', mealAccuracyUltBip: '0:04:41', mealAccuracy1Bip: '0:05:27', hhNotRetun: 0, bh: null, dashBonus: null },
+                { nome: 'CLAYTON DA SILVA ALVES', ldap: 'cdasilvalves', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 158.42, utilizacaoOut: 84.97, fastStart: '0:02:58', strongFinish: '0:00:19', mealAccuracy: '0:58:07', mealAccuracyUltBip: '0:06:38', mealAccuracy1Bip: '0:06:52', hhNotRetun: 0, bh: '16:57:00', dashBonus: null }
+            ],
+            agosto: [
+                { nome: 'GLEIDE CASSIA DOS SANTOS SILVA', ldap: 'gleidssilva', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 130.87, utilizacaoOut: 86.00, fastStart: '0:04:00', strongFinish: '55:57', mealAccuracy: '0:59:00', mealAccuracyUltBip: '0:03:00', mealAccuracy1Bip: '0:04:00', hhNotRetun: 0, bh: '19:49:00', dashBonus: null },
+                { nome: 'LUCICLEUSA PIRES DOS SANTOS', ldap: 'lucicleuspsa', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 155.67, utilizacaoOut: 78.40, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:04:24', mealAccuracyUltBip: '00:55:52', mealAccuracy1Bip: '00:05:54', hhNotRetun: 0, bh: '-8:58:00', dashBonus: null },
+                { nome: 'MAIRLLAR DOS SANTOS BARCELOS', ldap: 'mbarcelos', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 158.91, utilizacaoOut: 84.09, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:03:18', mealAccuracyUltBip: '00:57:53', mealAccuracy1Bip: '00:04:16', hhNotRetun: 0, bh: '-2:08:00', dashBonus: null },
+                { nome: 'VILMA VENANCIO DOS SANTOS', ldap: 'vvdossantos', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 150.1, utilizacaoOut: 85.49, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:04:09', mealAccuracyUltBip: '00:57:16', mealAccuracy1Bip: '00:05:09', hhNotRetun: 0, bh: '0:59:00', dashBonus: null },
+                { nome: 'MARIA APARECIDA SANTOS SOUZA', ldap: 'ext_aparemar', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 154.2, utilizacaoOut: 84.83, fastStart: '00:00:00', strongFinish: '00:00:07', mealAccuracy: '00:04:51', mealAccuracyUltBip: '00:53:26', mealAccuracy1Bip: '00:05:00', hhNotRetun: 0, bh: null, dashBonus: null },
+                { nome: 'CLAYTON DA SILVA ALVES', ldap: 'cdasilvalves', ocorrencias: 1, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 156.45, utilizacaoOut: 81.55, fastStart: '00:00:00', strongFinish: '00:00:23', mealAccuracy: '00:04:30', mealAccuracyUltBip: '00:55:24', mealAccuracy1Bip: '00:05:44', hhNotRetun: 0, bh: '-18:59:00', dashBonus: null },
+                { nome: 'LUAN VIEIRA DE LIMA', ldap: 'lualvvieira', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 113.88, utilizacaoOut: 77.03, fastStart: '0:05:00', strongFinish: '00:00:00', mealAccuracy: '00:04:19', mealAccuracyUltBip: '00:55:59', mealAccuracy1Bip: '00:05:15', hhNotRetun: 4, bh: '-6:10:00', dashBonus: null },
+                { nome: 'PERSON DA SILVA NASCIMENTO', ldap: 'pepnnascimen', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 1, produtividade: 0, utilizacaoOut: 0.00, fastStart: '0:02:00', strongFinish: '0:03:00', mealAccuracy: '0:58:00', mealAccuracyUltBip: '00:58:17', mealAccuracy1Bip: '0:04:00', hhNotRetun: 3, bh: '-14:23:00', dashBonus: null },
+                { nome: 'ABNER GEOVANI DA SILVA', ldap: 'abassilva', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 150.7, utilizacaoOut: 82.64, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:05:04', mealAccuracyUltBip: '00:56:22', mealAccuracy1Bip: '00:06:11', hhNotRetun: 1, bh: '-2:59:00', dashBonus: null },
+                { nome: 'PABLO HENRIQUE FERNANDES ROCHA', ldap: 'ppffernandes', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 156.9, utilizacaoOut: 81.51, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:04:40', mealAccuracyUltBip: '00:55:24', mealAccuracy1Bip: '00:05:44', hhNotRetun: 1, bh: '-9:53:00', dashBonus: null }
+            ]
+        };
+        
+        // Define as metas de performance
+        const goals = {
+            produtividade: 85,
+            utilizacaoOut: 80,
+            ocorrencias: 0,
+            atestado: 0,
+            faltaInjustificada: 0,
+            fastStart: 0, // minutos
+            strongFinish: 0, // minutos
+            mealAccuracy: 60, // minutos
+            mealAccuracyUltBip: 5, // minutos
+            mealAccuracy1Bip: 5, // minutos
+            hhNotRetun: 0
+        };
+
+        // Armazena as instâncias dos gráficos para destruí-las e recriá-las
+        let chartInstances = {};
+
+        // Funções auxiliares
+        function parseTime(timeStr) {
+            if (!timeStr || typeof timeStr !== 'string' || timeStr.trim() === '-') return null;
+            const isNegative = timeStr.startsWith('-');
+            const cleanStr = timeStr.replace(/^-/, '');
+            const parts = cleanStr.split(':').map(Number);
+            let totalMinutes = 0;
+            if (parts.length === 3) {
+                totalMinutes = parts[0] * 60 + parts[1] + parts[2] / 60;
+            } else if (parts.length === 2) {
+                totalMinutes = parts[0] + parts[1] / 60;
+            }
+            return isNegative ? -totalMinutes : totalMinutes;
+        }
+
+        function formatTimeFromMinutes(minutes) {
+            if (minutes === null || isNaN(minutes)) return '--:--';
+            const sign = minutes < 0 ? '-' : '';
+            const absMinutes = Math.abs(minutes);
+            const h = Math.floor(absMinutes / 60);
+            const m = Math.round(absMinutes % 60);
+            return `${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+        
+        function formatPercentage(value) {
+            return value !== null ? `${Math.round(value)}%` : '--';
+        }
+
+        function getStatus(prod) {
+            if (prod === null || isNaN(prod)) return 'N/A';
+            if (prod >= 85) return 'Excelente';
+            if (prod >= 80) return 'Bom';
+            if (prod >= 75) return 'Atenção';
+            return 'Crítico';
+        }
+
+        function getStatusColor(prod) {
+            if (prod === null || isNaN(prod)) return 'bg-gray-200 text-gray-800';
+            if (prod >= 85) return 'bg-emerald-100 text-emerald-800';
+            if (prod >= 80) return 'bg-sky-100 text-sky-800';
+            if (prod >= 75) return 'bg-amber-100 text-amber-800';
+            return 'bg-rose-100 text-rose-800';
+        }
+
+        function getGoalProgress(value, goal, isTime = false) {
+            if (value === null || goal === null) return 0;
+            let progress = 0;
+            if (isTime) {
+                 if (goal === 0) progress = 100;
+                 else progress = Math.min(100, (goal / value) * 100);
+            } else {
+                if (goal === 0) progress = 100;
+                else progress = Math.min(100, (value / goal) * 100);
+            }
+            return Math.round(progress);
+        }
+
+        function getGoalColor(value, goal, isTime = false) {
+            if (value === null || goal === null) return 'bg-gray-300';
+            if (isTime) {
+                if (value <= goal) return 'bg-emerald-500';
+                if (value <= goal + 3) return 'bg-amber-500';
+                return 'bg-red-500';
+            }
+            if (value >= goal) return 'bg-emerald-500';
+            if (value >= goal * 0.9) return 'bg-amber-500';
+            return 'bg-red-500';
+        }
+
+        // Renderiza a seção de top performers
+        function renderTopPerformers(mes) {
+            const topList = document.getElementById('top-performers-list');
+            const bottomList = document.getElementById('bottom-performers-list');
+            topList.innerHTML = '<h3 class="text-xl font-bold text-gray-800 mb-4">Melhores Performances 💪</h3>';
+            bottomList.innerHTML = '<h3 class="text-xl font-bold text-gray-800 mb-4">Oportunidades de Melhoria 🙏</h3>';
+
+            const dadosMes = allData[mes].filter(d => d.produtividade !== null && !isNaN(d.produtividade));
+            
+            const sortedByProd = [...dadosMes].sort((a, b) => b.produtividade - a.produtividade);
+            const top3 = sortedByProd.slice(0, 3);
+            const bottom3 = sortedByProd.slice(-3).reverse();
+
+            top3.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center space-x-3 p-2 bg-gray-50/50 rounded-lg fade-in';
+                item.innerHTML = `<i data-feather="star" class="text-yellow-500"></i> <span class="font-medium text-gray-800">${p.nome.split(' ')[0]}</span> <span class="text-sm text-gray-500">${Math.round(p.produtividade)}%</span>`;
+                topList.appendChild(item);
+            });
+
+            bottom3.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center space-x-3 p-2 bg-gray-50/50 rounded-lg fade-in';
+                item.innerHTML = `<i data-feather="alert-triangle" class="text-red-500"></i> <span class="font-medium text-gray-800">${p.nome.split(' ')[0]}</span> <span class="text-sm text-gray-500">${Math.round(p.produtividade)}%</span>`;
+                bottomList.appendChild(item);
+            });
+
+            feather.replace();
+        }
+
+        // Atualiza as métricas principais
+        function updateMainMetrics(mes, selectedLdap) {
+            const container = document.getElementById('main-metrics-container').querySelector('div');
+            container.innerHTML = '';
+            
+            const dadosMesAtual = allData[mes];
+            const dadosFiltrados = selectedLdap === 'all' ? dadosMesAtual : dadosMesAtual.filter(d => d.ldap === selectedLdap);
+
+            const calculateAverage = (key) => {
+                const values = dadosFiltrados.map(d => d[key]).filter(v => v !== null && !isNaN(v));
+                return values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : null;
+            };
+
+            const calculateSum = (key) => {
+                const values = dadosFiltrados.map(d => d[key]).filter(v => v !== null && !isNaN(v));
+                return values.length > 0 ? values.reduce((sum, v) => sum + v, 0) : null;
+            };
+
+            const calculateTimeAverage = (key) => {
+                const values = dadosFiltrados.map(d => parseTime(d[key])).filter(v => v !== null && !isNaN(v));
+                return values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : null;
+            };
+
+            const metrics = [
+                { label: 'Produtividade Líquida', key: 'produtividade', icon: `<i data-feather="trending-up" class="w-6 h-6 text-emerald-500"></i>`, format: formatPercentage, hasGoal: true },
+                { label: 'Utilização OUT', key: 'utilizacaoOut', icon: `<i data-feather="pie-chart" class="w-6 h-6 text-indigo-500"></i>`, format: formatPercentage, hasGoal: true },
+                { label: 'Ocorrências', key: 'ocorrencias', icon: `<i data-feather="alert-circle" class="w-6 h-6 text-rose-500"></i>`, format: val => val !== null ? val : '--', hasGoal: true },
+                { label: 'Medidas Disciplinares', key: 'medidasDisciplinar', icon: `<i data-feather="slash" class="w-6 h-6 text-red-500"></i>`, format: val => val !== null ? val : '--' },
+                { label: 'Atestados', key: 'atestado', icon: `<i data-feather="file-text" class="w-6 h-6 text-amber-500"></i>`, format: val => val !== null ? val : '--', hasGoal: true },
+                { label: 'Faltas Injustificadas', key: 'faltaInjustificada', icon: `<i data-feather="x-circle" class="w-6 h-6 text-orange-500"></i>`, format: val => val !== null ? val : '--', hasGoal: true },
+                { label: 'Fast Start', key: 'fastStart', icon: `<i data-feather="play-circle" class="w-6 h-6 text-green-500"></i>`, format: formatTimeFromMinutes, hasGoal: true, isTime: true },
+                { label: 'Strong Finish', key: 'strongFinish', icon: `<i data-feather="stop-circle" class="w-6 h-6 text-red-500"></i>`, format: formatTimeFromMinutes, hasGoal: true, isTime: true },
+                { label: 'Meal Accuracy', key: 'mealAccuracy', icon: `<i data-feather="clock" class="w-6 h-6 text-blue-500"></i>`, format: formatTimeFromMinutes, hasGoal: true, isTime: true },
+                { label: 'Meal Accuracy Ult Bip', key: 'mealAccuracyUltBip', icon: `<i data-feather="watch" class="w-6 h-6 text-purple-500"></i>`, format: formatTimeFromMinutes, hasGoal: true, isTime: true },
+                { label: 'Meal Accuracy 1º Bip', key: 'mealAccuracy1Bip', icon: `<i data-feather="fast-forward" class="w-6 h-6 text-yellow-500"></i>`, format: formatTimeFromMinutes, hasGoal: true, isTime: true },
+                { label: 'HH Not Retun', key: 'hhNotRetun', icon: `<i data-feather="log-out" class="w-6 h-6 text-gray-500"></i>`, format: val => val !== null ? val : '--', hasGoal: true },
+                { label: 'BH', key: 'bh', icon: `<i data-feather="calendar" class="w-6 h-6 text-teal-500"></i>`, format: formatTimeFromMinutes, hasGoal: false },
+                { label: 'Dash Bonus', key: 'dashBonus', icon: `<i data-feather="star" class="w-6 h-6 text-yellow-500"></i>`, format: val => val !== null ? `${Math.round(val)}%` : '--' }
+            ];
+
+            const title = document.getElementById('main-metrics-container').querySelector('h2');
+            title.innerHTML = selectedLdap === 'all' ? `Métricas Gerais 📈` : `Métricas de **${dadosFiltrados[0]?.nome.split(' ')[0]}** 🧑‍💼`;
+            title.classList.add('fade-in');
+
+            metrics.forEach(metric => {
+                const isTimeMetric = ['fastStart', 'strongFinish', 'mealAccuracy', 'mealAccuracyUltBip', 'mealAccuracy1Bip'].includes(metric.key);
+                let value;
+                if (isTimeMetric) {
+                     value = calculateTimeAverage(metric.key);
+                } else if (metric.key === 'medidasDisciplinar' || metric.key === 'atestado' || metric.key === 'faltaInjustificada' || metric.key === 'ocorrencias' || metric.key === 'hhNotRetun') {
+                    value = selectedLdap === 'all' ? calculateSum(metric.key) : dadosFiltrados[0]?.[metric.key];
+                } else {
+                    value = selectedLdap === 'all' ? calculateAverage(metric.key) : dadosFiltrados[0]?.[metric.key];
+                }
+
+                let progressHtml = '';
+                if (metric.hasGoal) {
+                    const goal = goals[metric.key];
+                    const progress = getGoalProgress(value, goal, isTimeMetric);
+                    const color = getGoalColor(value, goal, isTimeMetric);
+                    
+                    progressHtml = `
+                        <div class="mt-4">
+                            <div class="h-2 bg-gray-200 rounded-full">
+                                <div class="h-full rounded-full ${color}" style="width: ${progress}%;"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">${progress}% da meta</div>
+                        </div>
+                    `;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'glass-card p-6 flex items-start space-x-4 fade-in';
+                
+                card.innerHTML = `
+                    <div class="p-3 bg-white rounded-lg shadow-sm">
+                        ${metric.icon}
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">${metric.label}</p>
+                        <h3 class="text-2xl font-bold text-gray-800">${metric.format(value)}</h3>
+                        ${progressHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            feather.replace();
+        }
+
+        // Renderiza os gráficos
+        function renderCharts(mes, selectedLdap) {
+            // Destruir gráficos anteriores
+            Object.values(chartInstances).forEach(chart => chart.destroy());
+            
+            const productivityCtx = document.getElementById('productivityChart').getContext('2d');
+            const mealAccuracyCtx = document.getElementById('mealAccuracyChart').getContext('2d');
+
+            const selectedEmployeeData = allData.julho.find(d => d.ldap === selectedLdap);
+            const selectedEmployeeData2 = allData.agosto.find(d => d.ldap === selectedLdap);
+            const currentMonthData = allData[mes].find(d => d.ldap === selectedLdap);
+            
+            if (selectedLdap === 'all') {
+                document.getElementById('charts-container').style.display = 'none';
+                return;
+            } else {
+                document.getElementById('charts-container').style.display = 'grid';
+            }
+
+            // Gráfico de Linhas - Evolução de Performance (Comparativo de Produtividade)
+            chartInstances.productivityChart = new Chart(productivityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Julho', 'Agosto'],
+                    datasets: [
+                        {
+                            label: 'Produtividade Líquida (%)',
+                            data: [selectedEmployeeData?.produtividade, selectedEmployeeData2?.produtividade],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#3b82f6',
+                            pointHoverRadius: 8
+                        },
+                        {
+                            label: 'Utilização OUT (%)',
+                            data: [selectedEmployeeData?.utilizacaoOut, selectedEmployeeData2?.utilizacaoOut],
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#06b6d4',
+                            pointHoverRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            title: { display: true, text: 'Porcentagem' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${Math.round(context.raw)}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Barras - Métricas de Refeição para o mês selecionado
+            chartInstances.mealAccuracyChart = new Chart(mealAccuracyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Meal Accuracy', 'Ult Bip', '1º Bip'],
+                    datasets: [{
+                        label: 'Tempo (min)',
+                        data: [
+                            parseTime(currentMonthData?.mealAccuracy),
+                            parseTime(currentMonthData?.mealAccuracyUltBip),
+                            parseTime(currentMonthData?.mealAccuracy1Bip)
+                        ],
+                        backgroundColor: ['#10b981', '#fcd34d', '#3b82f6'],
+                        borderColor: ['#10b981', '#fcd34d', '#3b82f6'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            title: { display: true, text: 'Minutos' }
+                        },
+                        x: {
+                            grid: { grid: { display: false } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${Math.round(context.raw)} min`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Renderiza a tabela
+        function renderTable(mes, selectedLdap) {
+            const tableBody = document.getElementById('data-table-body');
+            tableBody.innerHTML = '';
+            
+            let dados = allData[mes];
+            if (selectedLdap !== 'all') {
+                dados = dados.filter(d => d.ldap === selectedLdap);
+            }
+
+            dados.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-100/50 transition cursor-pointer';
+                row.setAttribute('data-ldap', item.ldap);
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                <i data-feather="user" class="text-blue-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${item.nome}</div>
+                                <div class="text-sm text-gray-500">${item.ldap}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.produtividade !== null ? Math.round(item.produtividade) + '%' : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.utilizacaoOut !== null ? Math.round(item.utilizacaoOut) + '%' : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.ocorrencias !== null ? item.ocorrencias : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.medidasDisciplinar !== null ? item.medidasDisciplinar : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.atestado !== null ? item.atestado : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.faltaInjustificada !== null ? item.faltaInjustificada : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.fastStart !== null ? item.fastStart : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.strongFinish !== null ? item.strongFinish : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.mealAccuracy !== null ? item.mealAccuracy : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.mealAccuracyUltBip !== null ? item.mealAccuracyUltBip : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.mealAccuracy1Bip !== null ? item.mealAccuracy1Bip : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.hhNotRetun !== null ? item.hhNotRetun : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${item.bh !== null ? item.bh : '-'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(item.produtividade)}">
+                            ${getStatus(item.produtividade)}
+                        </span>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            feather.replace();
+
+            // Adiciona evento de clique para abrir o modal
+            document.querySelectorAll('#data-table-body tr').forEach(row => {
+                row.addEventListener('click', () => {
+                    const ldap = row.getAttribute('data-ldap');
+                    openModal(ldap, mes);
+                });
+            });
+        }
+
+        function openModal(ldap, mes) {
+            const modal = document.getElementById('employee-modal');
+            const modalName = document.getElementById('modal-employee-name');
+            const modalMetrics = document.getElementById('modal-metrics-list');
+            const modalChartCanvas = document.getElementById('modalChart');
+            
+            const employeeDataJul = allData.julho.find(d => d.ldap === ldap);
+            const employeeDataAug = allData.agosto.find(d => d.ldap === ldap);
+            const employeeData = allData[mes].find(d => d.ldap === ldap);
+
+            if (!employeeData) return;
+
+            modalName.textContent = `Análise de ${employeeData.nome} - ${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
+            modalMetrics.innerHTML = '';
+            
+            // Popula as métricas no modal
+            Object.keys(employeeData).forEach(key => {
+                const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                let value = employeeData[key];
+                
+                if (typeof value === 'number') {
+                    if (key === 'produtividade' || key === 'utilizacaoOut' || key === 'dashBonus') {
+                        value = Math.round(value) + '%';
+                    } else {
+                        value = Math.round(value);
+                    }
+                }
+                
+                const metricItem = document.createElement('div');
+                metricItem.className = 'flex justify-between items-center py-2 border-b last:border-b-0';
+                metricItem.innerHTML = `
+                    <span class="text-sm font-medium text-gray-600">${label}</span>
+                    <span class="text-sm font-bold text-gray-800">${value || '-'}</span>
+                `;
+                modalMetrics.appendChild(metricItem);
+            });
+
+            // Renderiza o gráfico de histórico no modal
+            if (chartInstances.modalChart) {
+                chartInstances.modalChart.destroy();
+            }
+
+            const dataPoints = [];
+            if (employeeDataJul?.produtividade) {
+                dataPoints.push({ x: 'Julho', y: employeeDataJul.produtividade });
+            }
+            if (employeeDataAug?.produtividade) {
+                dataPoints.push({ x: 'Agosto', y: employeeDataAug.produtividade });
+            }
+
+            chartInstances.modalChart = new Chart(modalChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: dataPoints.map(p => p.x),
+                    datasets: [{
+                        label: 'Produtividade Líquida (%)',
+                        data: dataPoints.map(p => p.y),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#3b82f6',
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            title: { display: true, text: 'Porcentagem' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${Math.round(context.raw)}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            modal.classList.remove('hidden');
+            feather.replace();
+        }
+
+        function closeModal() {
+            document.getElementById('employee-modal').classList.add('hidden');
+        }
+        document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+
+        // Atualiza o dashboard quando os seletores mudam
+        const monthSelector = document.getElementById('month-selector');
+        const employeeSelector = document.getElementById('employee-selector');
+
+        function updateDashboard() {
+            const selectedMonth = monthSelector.value;
+            const selectedEmployee = employeeSelector.value;
+            updateMainMetrics(selectedMonth, selectedEmployee);
+            renderCharts(selectedMonth, selectedEmployee);
+            renderTable(selectedMonth, selectedEmployee);
+
+            document.getElementById('top-performers-container').style.display = selectedEmployee === 'all' ? 'block' : 'none';
+            if (selectedEmployee === 'all') {
+                renderTopPerformers(selectedMonth);
+            }
+            
+            document.querySelectorAll('.glass-card').forEach((card, index) => {
+                card.classList.remove('fade-in');
+                void card.offsetWidth; // Recalcula o layout para a animação
+                card.classList.add('fade-in');
+            });
+        }
+
+        monthSelector.addEventListener('change', updateDashboard);
+        employeeSelector.addEventListener('change', updateDashboard);
+
+        // Inicializa o dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preenche o seletor de colaboradores
+            const uniqueEmployees = [...new Set(Object.values(allData).flatMap(monthData => monthData.map(d => d.ldap)))];
+            const employeeNames = {};
+            Object.values(allData).flatMap(d => d).forEach(e => {
+                if (!employeeNames[e.ldap]) {
+                    employeeNames[e.ldap] = e.nome;
+                }
+            });
+
+            uniqueEmployees.forEach(ldap => {
+                const option = document.createElement('option');
+                option.value = ldap;
+                option.textContent = employeeNames[ldap];
+                employeeSelector.appendChild(option);
+            });
+
+            updateDashboard();
+        });
+    </script>
+</body>
+</html>
