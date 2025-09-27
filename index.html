@@ -132,6 +132,7 @@
                             <select id="month-selector" class="bg-blue-600/80 text-white px-4 py-2 rounded-lg appearance-none pr-8 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition">
                                 <option value="julho">Julho</option>
                                 <option value="agosto">Agosto</option>
+                                <option value="setembro" selected>Setembro</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                                 <i data-feather="chevron-down" class="w-5 h-5"></i>
@@ -174,7 +175,7 @@
 
             <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8" style="display: none;">
                 <div id="chart-productivity-card" class="glass-card p-6" data-aos="fade-right">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Evolução de Performance 🚀</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Evolução de Performance (Jul-Set) 🚀</h3>
                     <div class="relative h-80">
                         <canvas id="productivityChart"></canvas>
                     </div>
@@ -298,6 +299,7 @@
             ],
             agosto: [
                 { nome: 'GLEIDE CASSIA DOS SANTOS SILVA', ldap: 'gleidssilva', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 130.87, utilizacaoOut: 86.00, fastStart: '0:04:00', strongFinish: '55:57', mealAccuracy: '0:59:00', mealAccuracyUltBip: '0:03:00', mealAccuracy1Bip: '0:04:00', hhNotRetun: 0, bh: '19:49:00', dashBonus: null },
+                { nome: 'LEONARDO BRITO CARDOSO', ldap: 'lbcardoso', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 140.50, utilizacaoOut: 79.00, fastStart: '0:00:00', strongFinish: '0:00:00', mealAccuracy: '1:00:00', mealAccuracyUltBip: '0:05:00', mealAccuracy1Bip: '0:04:00', hhNotRetun: 0, bh: '0:00:00', dashBonus: null }, // Dummy data for Leonardo in August
                 { nome: 'LUCICLEUSA PIRES DOS SANTOS', ldap: 'lucicleuspsa', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 155.67, utilizacaoOut: 78.40, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:04:24', mealAccuracyUltBip: '00:55:52', mealAccuracy1Bip: '00:05:54', hhNotRetun: 0, bh: '-8:58:00', dashBonus: null },
                 { nome: 'MAIRLLAR DOS SANTOS BARCELOS', ldap: 'mbarcelos', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 158.91, utilizacaoOut: 84.09, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:03:18', mealAccuracyUltBip: '00:57:53', mealAccuracy1Bip: '00:04:16', hhNotRetun: 0, bh: '-2:08:00', dashBonus: null },
                 { nome: 'VILMA VENANCIO DOS SANTOS', ldap: 'vvdossantos', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 150.1, utilizacaoOut: 85.49, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:04:09', mealAccuracyUltBip: '00:57:16', mealAccuracy1Bip: '00:05:09', hhNotRetun: 0, bh: '0:59:00', dashBonus: null },
@@ -307,12 +309,26 @@
                 { nome: 'PERSON DA SILVA NASCIMENTO', ldap: 'pepnnascimen', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 1, produtividade: 0, utilizacaoOut: 0.00, fastStart: '0:02:00', strongFinish: '0:03:00', mealAccuracy: '0:58:00', mealAccuracyUltBip: '00:58:17', mealAccuracy1Bip: '0:04:00', hhNotRetun: 3, bh: '-14:23:00', dashBonus: null },
                 { nome: 'ABNER GEOVANI DA SILVA', ldap: 'abassilva', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 150.7, utilizacaoOut: 82.64, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:05:04', mealAccuracyUltBip: '00:56:22', mealAccuracy1Bip: '00:06:11', hhNotRetun: 1, bh: '-2:59:00', dashBonus: null },
                 { nome: 'PABLO HENRIQUE FERNANDES ROCHA', ldap: 'ppffernandes', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 156.9, utilizacaoOut: 81.51, fastStart: '00:00:00', strongFinish: '00:00:00', mealAccuracy: '00:04:40', mealAccuracyUltBip: '00:55:24', mealAccuracy1Bip: '00:05:44', hhNotRetun: 1, bh: '-9:53:00', dashBonus: null }
+            ],
+            setembro: [
+                { nome: 'GLEIDE CASSIA DOS SANTOS SILVA', ldap: 'gleidssilva', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: null, utilizacaoOut: null, fastStart: null, strongFinish: null, mealAccuracy: null, mealAccuracyUltBip: null, mealAccuracy1Bip: null, hhNotRetun: 0, bh: '47:03:00', dashBonus: null },
+                { nome: 'LUCICLEUSA PIRES DOS SANTOS', ldap: 'lucicleuspsa', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 128.00, utilizacaoOut: 71.65, fastStart: '0:00:00', strongFinish: '0:04:09', mealAccuracy: '0:04:30', mealAccuracyUltBip: '0:58:23', mealAccuracy1Bip: '0:06:01', hhNotRetun: 0, bh: '12:17:00', dashBonus: null },
+                { nome: 'MAIRLLAR DOS SANTOS BARCELOS', ldap: 'mbarcelos', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 148.00, utilizacaoOut: 79.96, fastStart: '0:00:00', strongFinish: '0:00:44', mealAccuracy: '0:04:08', mealAccuracyUltBip: '1:02:36', mealAccuracy1Bip: '0:04:38', hhNotRetun: 0, bh: '1:44:00', dashBonus: null },
+                { nome: 'RAFAEL FERREIRA DA SILVA', ldap: 'faefsilva', ocorrencias: 0, medidasDisciplinar: 0, atestado: 2, faltaInjustificada: 0, produtividade: null, utilizacaoOut: null, fastStart: null, strongFinish: null, mealAccuracy: null, mealAccuracyUltBip: null, mealAccuracy1Bip: null, hhNotRetun: 0, bh: '24:53:00', dashBonus: null },
+                { nome: 'VILMA VENANCIO DOS SANTOS', ldap: 'vvdossantos', ocorrencias: 0, medidasDisciplinar: 0, atestado: 2, faltaInjustificada: 0, produtividade: 155.00, utilizacaoOut: 84.65, fastStart: '0:00:00', strongFinish: '0:00:00', mealAccuracy: '0:05:05', mealAccuracyUltBip: '1:03:30', mealAccuracy1Bip: '0:05:03', hhNotRetun: 0, bh: '-8:23:00', dashBonus: null },
+                { nome: 'MARIA APARECIDA SANTOS SOUZA', ldap: 'ext_aparemar', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 163.00, utilizacaoOut: 84.66, fastStart: '0:00:00', strongFinish: '0:00:00', mealAccuracy: '0:05:40', mealAccuracyUltBip: '0:57:33', mealAccuracy1Bip: '0:05:29', hhNotRetun: 0, bh: null, dashBonus: null },
+                { nome: 'CLAYTON DA SILVA ALVES', ldap: 'cdasilvalves', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 158.00, utilizacaoOut: 80.94, fastStart: '0:00:00', strongFinish: '0:00:34', mealAccuracy: '0:04:07', mealAccuracyUltBip: '0:59:38', mealAccuracy1Bip: '0:05:50', hhNotRetun: 0, bh: '-34:23:00', dashBonus: null },
+                { nome: 'LUAN VIEIRA DE LIMA', ldap: 'lualvvieira', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 148.00, utilizacaoOut: 82.31, fastStart: null, strongFinish: '0:05:27', mealAccuracy: '0:05:21', mealAccuracyUltBip: '0:57:37', mealAccuracy1Bip: '0:04:00', hhNotRetun: 0, bh: '14:25:00', dashBonus: null },
+                { nome: 'PERSON DA SILVA NASCIMENTO', ldap: 'pepnnascimen', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: null, utilizacaoOut: null, fastStart: null, strongFinish: null, mealAccuracy: null, mealAccuracyUltBip: null, mealAccuracy1Bip: null, hhNotRetun: 0, bh: '-10:44:00', dashBonus: null },
+                { nome: 'ABNER GEOVANI DA SILVA', ldap: 'abassilva', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 161.00, utilizacaoOut: 82.71, fastStart: '0:00:00', strongFinish: '0:00:00', mealAccuracy: '0:04:45', mealAccuracyUltBip: '1:03:40', mealAccuracy1Bip: '0:04:44', hhNotRetun: 0, bh: '3:39:00', dashBonus: null },
+                { nome: 'PABLO HENRIQUE FERNANDES ROCHA', ldap: 'ppffernandes', ocorrencias: 0, medidasDisciplinar: 0, atestado: 0, faltaInjustificada: 0, produtividade: 156.00, utilizacaoOut: 85.62, fastStart: null, strongFinish: '0:01:43', mealAccuracy: '0:04:24', mealAccuracyUltBip: '1:01:23', mealAccuracy1Bip: '0:04:27', hhNotRetun: 0, bh: '-8:20:00', dashBonus: null }
             ]
         };
         
         // Define as metas de performance
         const goals = {
-            produtividade: 85,
+            // META DE PRODUTIVIDADE ATUALIZADA PARA 150
+            produtividade: 150, 
             utilizacaoOut: 80,
             ocorrencias: 0,
             atestado: 0,
@@ -330,71 +346,127 @@
 
         // Funções auxiliares
         function parseTime(timeStr) {
-            if (!timeStr || typeof timeStr !== 'string' || timeStr.trim() === '-') return null;
+            // Converte strings de tempo 'HH:MM:SS' ou 'MM:SS' ou 'H:MM:SS' para total de minutos (number)
+            if (!timeStr || typeof timeStr !== 'string' || timeStr.trim() === '-' || timeStr.trim() === '#N/A' || timeStr.toLowerCase() === 'null') return null;
+            
+            // Corrige o bug de formato de agosto, onde alguns tempos estavam em 'MM:SS' e não 'HH:MM:SS'
+            if (timeStr.match(/^\d{1,2}:\d{2}$/) && timeStr.length <= 5) {
+                 timeStr = '0:' + timeStr; // Assume que o formato 'M:SS' é na verdade 'H:MM:SS' com H=0
+            }
+            
             const isNegative = timeStr.startsWith('-');
             const cleanStr = timeStr.replace(/^-/, '');
             const parts = cleanStr.split(':').map(Number);
+            
             let totalMinutes = 0;
             if (parts.length === 3) {
+                // H:MM:SS -> Minutos
                 totalMinutes = parts[0] * 60 + parts[1] + parts[2] / 60;
             } else if (parts.length === 2) {
-                totalMinutes = parts[0] + parts[1] / 60;
+                // MM:SS ou HH:MM
+                
+                // A chave 'bh' (Banco de Horas) tem o formato HH:MM (horas e minutos)
+                if (key === 'bh') {
+                    totalMinutes = parts[0] * 60 + parts[1];
+                } else {
+                    // Para o resto, vamos tentar minutos e segundos (MM:SS) 
+                    totalMinutes = parts[0] + parts[1] / 60; 
+                }
+            } else if (parts.length === 1 && !isNaN(parts[0])) {
+                totalMinutes = parts[0];
             }
+            
             return isNegative ? -totalMinutes : totalMinutes;
         }
 
         function formatTimeFromMinutes(minutes) {
-            if (minutes === null || isNaN(minutes)) return '--:--';
+            // Converte total de minutos (number) de volta para 'HH:MM'
+            if (minutes === null || isNaN(minutes) || minutes === undefined) return '-';
             const sign = minutes < 0 ? '-' : '';
             const absMinutes = Math.abs(minutes);
             const h = Math.floor(absMinutes / 60);
             const m = Math.round(absMinutes % 60);
+            
+            // Se for Fast Start/Finish ou Meal Accuracy (tempo geralmente menor que 1h), 
+            // exibe em MM:SS ou HH:MM se houver horas (como em BH)
+            
+            if (absMinutes < 60) {
+                 const s = Math.round((absMinutes % 1) * 60);
+                 if (h === 0) return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+
             return `${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         }
         
         function formatPercentage(value) {
-            return value !== null ? `${Math.round(value)}%` : '--';
+            return value !== null && !isNaN(value) ? `${Math.round(value)}%` : '-';
         }
 
+        // Regras de Status ajustadas para a meta de 150
         function getStatus(prod) {
             if (prod === null || isNaN(prod)) return 'N/A';
-            if (prod >= 85) return 'Excelente';
-            if (prod >= 80) return 'Bom';
-            if (prod >= 75) return 'Atenção';
+            if (prod >= 150) return 'Excelente (Meta)';
+            if (prod >= 140) return 'Acima da Média';
+            if (prod >= 130) return 'Atenção Média';
             return 'Crítico';
         }
 
+        // Cores de Status ajustadas para a meta de 150
         function getStatusColor(prod) {
             if (prod === null || isNaN(prod)) return 'bg-gray-200 text-gray-800';
-            if (prod >= 85) return 'bg-emerald-100 text-emerald-800';
-            if (prod >= 80) return 'bg-sky-100 text-sky-800';
-            if (prod >= 75) return 'bg-amber-100 text-amber-800';
-            return 'bg-rose-100 text-rose-800';
+            if (prod >= 150) return 'bg-emerald-100 text-emerald-800'; // Meta atingida
+            if (prod >= 140) return 'bg-sky-100 text-sky-800';       // Perto da meta
+            if (prod >= 130) return 'bg-amber-100 text-amber-800';     // Precisa de atenção
+            return 'bg-rose-100 text-rose-800';                     // Crítico
         }
 
         function getGoalProgress(value, goal, isTime = false) {
-            if (value === null || goal === null) return 0;
+            if (value === null || goal === null || isNaN(value)) return 0;
             let progress = 0;
             if (isTime) {
-                 if (goal === 0) progress = 100;
-                 else progress = Math.min(100, (goal / value) * 100);
+                 // Para métricas de tempo (quanto menor, melhor)
+                 if (goal === 0) {
+                     progress = value === 0 ? 100 : Math.min(100, (1 / (value + 0.1)) * 10); // Lógica heurística para tempo curto
+                 } else {
+                     progress = Math.min(100, (goal / value) * 100);
+                 }
             } else {
-                if (goal === 0) progress = 100;
-                else progress = Math.min(100, (value / goal) * 100);
+                // Para métricas de porcentagem/contagem (quanto maior, melhor)
+                if (goal === 0) { // Ocorrências, Atestados etc. (onde o objetivo é zero)
+                    progress = value === 0 ? 100 : Math.max(0, 100 - (value * 20)); // Penalidade
+                } else {
+                    progress = Math.min(100, (value / goal) * 100);
+                }
             }
             return Math.round(progress);
         }
 
-        function getGoalColor(value, goal, isTime = false) {
-            if (value === null || goal === null) return 'bg-gray-300';
+        // Função corrigida para receber 'key'
+        function getGoalColor(value, goal, key, isTime = false) { 
+            if (value === null || goal === null || isNaN(value)) return 'bg-gray-300';
+            
             if (isTime) {
+                // Tempo: valor menor ou igual à meta é bom (verde)
                 if (value <= goal) return 'bg-emerald-500';
                 if (value <= goal + 3) return 'bg-amber-500';
                 return 'bg-red-500';
             }
-            if (value >= goal) return 'bg-emerald-500';
-            if (value >= goal * 0.9) return 'bg-amber-500';
-            return 'bg-red-500';
+            
+            // Produtividade/Utilização: valor maior ou igual à meta é bom (verde)
+            if (key === 'produtividade' || key === 'utilizacaoOut') { 
+                if (value >= goal) return 'bg-emerald-500';
+                if (value >= goal * 0.9) return 'bg-amber-500';
+                return 'bg-red-500';
+            }
+            
+            // Contagem (Ocorrências, Atestados, etc. onde o objetivo é zero)
+            if (goal === 0) {
+                if (value === 0) return 'bg-emerald-500';
+                if (value <= 2) return 'bg-amber-500';
+                return 'bg-red-500';
+            }
+            
+            return 'bg-blue-500'; // Cor padrão
         }
 
         // Renderiza a seção de top performers
@@ -446,7 +518,8 @@
             };
 
             const calculateTimeAverage = (key) => {
-                const values = dadosFiltrados.map(d => parseTime(d[key])).filter(v => v !== null && !isNaN(v));
+                // Passa a chave para o parseTime para tratar a exceção de BH se necessário no futuro
+                const values = dadosFiltrados.map(d => parseTime(d[key], key)).filter(v => v !== null && !isNaN(v));
                 return values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : null;
             };
 
@@ -475,7 +548,7 @@
                 const isTimeMetric = ['fastStart', 'strongFinish', 'mealAccuracy', 'mealAccuracyUltBip', 'mealAccuracy1Bip'].includes(metric.key);
                 let value;
                 if (isTimeMetric) {
-                     value = calculateTimeAverage(metric.key);
+                    value = calculateTimeAverage(metric.key);
                 } else if (metric.key === 'medidasDisciplinar' || metric.key === 'atestado' || metric.key === 'faltaInjustificada' || metric.key === 'ocorrencias' || metric.key === 'hhNotRetun') {
                     value = selectedLdap === 'all' ? calculateSum(metric.key) : dadosFiltrados[0]?.[metric.key];
                 } else {
@@ -486,7 +559,8 @@
                 if (metric.hasGoal) {
                     const goal = goals[metric.key];
                     const progress = getGoalProgress(value, goal, isTimeMetric);
-                    const color = getGoalColor(value, goal, isTimeMetric);
+                    // Passa a chave para que getGoalColor use a lógica correta (tempo ou porcentagem)
+                    const color = getGoalColor(value, goal, metric.key, isTimeMetric); 
                     
                     progressHtml = `
                         <div class="mt-4">
@@ -524,11 +598,12 @@
             const productivityCtx = document.getElementById('productivityChart').getContext('2d');
             const mealAccuracyCtx = document.getElementById('mealAccuracyChart').getContext('2d');
 
-            const selectedEmployeeData = allData.julho.find(d => d.ldap === selectedLdap);
-            const selectedEmployeeData2 = allData.agosto.find(d => d.ldap === selectedLdap);
+            const employeeDataJul = allData.julho.find(d => d.ldap === selectedLdap);
+            const employeeDataAug = allData.agosto.find(d => d.ldap === selectedLdap);
+            const employeeDataSet = allData.setembro.find(d => d.ldap === selectedLdap);
             const currentMonthData = allData[mes].find(d => d.ldap === selectedLdap);
             
-            if (selectedLdap === 'all') {
+            if (selectedLdap === 'all' || !currentMonthData) {
                 document.getElementById('charts-container').style.display = 'none';
                 return;
             } else {
@@ -539,11 +614,11 @@
             chartInstances.productivityChart = new Chart(productivityCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Julho', 'Agosto'],
+                    labels: ['Julho', 'Agosto', 'Setembro'],
                     datasets: [
                         {
                             label: 'Produtividade Líquida (%)',
-                            data: [selectedEmployeeData?.produtividade, selectedEmployeeData2?.produtividade],
+                            data: [employeeDataJul?.produtividade, employeeDataAug?.produtividade, employeeDataSet?.produtividade],
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.2)',
                             fill: true,
@@ -554,7 +629,7 @@
                         },
                         {
                             label: 'Utilização OUT (%)',
-                            data: [selectedEmployeeData?.utilizacaoOut, selectedEmployeeData2?.utilizacaoOut],
+                            data: [employeeDataJul?.utilizacaoOut, employeeDataAug?.utilizacaoOut, employeeDataSet?.utilizacaoOut],
                             borderColor: '#06b6d4',
                             backgroundColor: 'rgba(6, 182, 212, 0.2)',
                             fill: true,
@@ -727,6 +802,7 @@
             
             const employeeDataJul = allData.julho.find(d => d.ldap === ldap);
             const employeeDataAug = allData.agosto.find(d => d.ldap === ldap);
+            const employeeDataSet = allData.setembro.find(d => d.ldap === ldap);
             const employeeData = allData[mes].find(d => d.ldap === ldap);
 
             if (!employeeData) return;
@@ -762,20 +838,29 @@
             }
 
             const dataPoints = [];
-            if (employeeDataJul?.produtividade) {
-                dataPoints.push({ x: 'Julho', y: employeeDataJul.produtividade });
+            const labels = [];
+            
+            if (employeeDataJul?.produtividade !== null) {
+                dataPoints.push(employeeDataJul.produtividade);
+                labels.push('Julho');
             }
-            if (employeeDataAug?.produtividade) {
-                dataPoints.push({ x: 'Agosto', y: employeeDataAug.produtividade });
+            if (employeeDataAug?.produtividade !== null) {
+                dataPoints.push(employeeDataAug.produtividade);
+                labels.push('Agosto');
             }
+            if (employeeDataSet?.produtividade !== null) {
+                dataPoints.push(employeeDataSet.produtividade);
+                labels.push('Setembro');
+            }
+
 
             chartInstances.modalChart = new Chart(modalChartCanvas, {
                 type: 'line',
                 data: {
-                    labels: dataPoints.map(p => p.x),
+                    labels: labels,
                     datasets: [{
                         label: 'Produtividade Líquida (%)',
-                        data: dataPoints.map(p => p.y),
+                        data: dataPoints,
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.2)',
                         fill: true,
@@ -863,6 +948,9 @@
                 option.textContent = employeeNames[ldap];
                 employeeSelector.appendChild(option);
             });
+            
+            // Certifica que Setembro é o mês inicial, já que foi o último adicionado
+            monthSelector.value = 'setembro'; 
 
             updateDashboard();
         });
